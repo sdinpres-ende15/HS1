@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Aplikasi Chat Responsif (Revisi Tampilan Lama)</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      :root {
+        --bg: #f5f6f7;
+        --card: #ffffff;
+        --muted: #8b8b8b;
+        --accentA: #c92aa3;
+        --accentB: #405bf0;
+        --radius: 12px;
+        --typing-bg: rgba(0, 0, 0, 0.06);
+        --avatar-bg: linear-gradient(180deg, #bbb, #999);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+        margin: 0;
+        background: var(--bg);
+        color: #111;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 18px;
+        overflow-x: hidden;
+      }
+
+      .app {
+        width: 1200px;
+        max-width: 100%;
+        height: 86vh;
+        background: var(--card);
+        border-radius: 14px;
+        display: flex;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(15, 15, 15, 0.06);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        position: relative;
+      }
+
+      /* 1. KOLOM IKON */
+      .col-icons {
+        width: 68px;
+        border-right: 1px solid rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 8px;
+        background: linear-gradient(180deg, #fff, #fbfbfb);
+        z-index: 5;
+      }
+      .brand {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: linear-gradient(45deg, var(--accentA), var(--accentB));
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+      }
+      .icon-btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .icon-btn.active,
+      .icon-btn:hover {
+        background: rgba(0, 0, 0, 0.03);
+        color: #111;
+      }
+      /* Tombol mobile disembunyikan di tampilan desktop */
+      .menu-btn-mobile,
+      .btn-back {
+        display: none;
+      }
+
+      /* 2. PANEL KONTAK/CHAT LIST */
+      .panel-contacts {
+        width: 360px;
+        border-right: 1px solid rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        gap: 10px;
+        background: linear-gradient(180deg, #fff, #fafafa);
+        z-index: 4;
+      }
+      .profile-mini {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .avatar-sm {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--avatar-bg);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+      }
+      /* Title dihilangkan di tampilan desktop (diganti profile-mini) */
+      .chat-list-title {
+        display: none;
+      }
+
+      .acct-meta {
+        font-size: 13px;
+      }
+      .acct-meta .name {
+        font-weight: 700;
+      }
+      .acct-meta .sub {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .search {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: #f3f3f3;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        margin-bottom: 8px;
+      }
+      .search input {
+        border: 0;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+        padding: 0;
+      }
+
+      .contacts-list {
+        overflow-y: auto;
+        padding-right: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex-grow: 1;
+      }
+      .contact {
+        display: flex;
+        gap: 12px;
+        padding: 10px 12px;
+        align-items: center;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.12s;
+        position: relative;
+      }
+      .contact:hover {
+        background: rgba(0, 0, 0, 0.03);
+      }
+      .contact.active {
+        background: #fff7ef;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+      }
+
+      .contact .avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        background: var(--avatar-bg);
+      }
+      .meta .name {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .meta .last {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .badge {
+        background: #ff375f;
+        color: #fff;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 12px;
+        margin-left: 8px;
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .last .time-text {
+        color: #aaa;
+        font-size: 12px;
+        margin-left: auto;
+      }
+
+      /* 3. MAIN CHAT PANEL (UNCHANGED) */
+      .main-chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        background: linear-gradient(180deg, #fff, #fcfcfc);
+      }
+      .chat-header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      }
+      .avatar-lg {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: var(--avatar-bg);
+        font-weight: 800;
+      }
+      .header-info .title {
+        font-weight: 800;
+        font-size: 16px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .header-info .sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+      .chat-body {
+        flex: 1;
+        overflow: auto;
+        padding: 22px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: relative;
+      }
+      .empty {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        padding: 40px;
+        text-align: center;
+      }
+      .msg {
+        max-width: 66%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 14px;
+        line-height: 1.35;
+        display: inline-block;
+        word-wrap: break-word;
+      }
+      .msg.you {
+        align-self: flex-end;
+        background: linear-gradient(90deg, var(--accentA), var(--accentB));
+        color: #fff;
+        border-bottom-right-radius: 6px;
+      }
+      .msg.them {
+        align-self: flex-start;
+        background: #f2f2f2;
+        color: #111;
+        border-bottom-left-radius: 6px;
+      }
+      .time {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+        text-align: right;
+      }
+      .typing-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        max-width: 48%;
+        border-radius: 14px;
+        background: var(--typing-bg);
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+      .typing-wrapper.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .typing-bubble {
+        width: 66px;
+        height: 36px;
+        border-radius: 18px;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 4px 8px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #666;
+        opacity: 0.14;
+        transform: translateY(0);
+        animation: typingDot 1s infinite ease-in-out;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.24s;
+      }
+      @keyframes typingDot {
+        0% {
+          opacity: 0.16;
+          transform: translateY(0px) scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: translateY(-6px) scale(1.15);
+        }
+        100% {
+          opacity: 0.16;
+          transform: translateY(0px) scale(1);
+        }
+      }
+      .composer {
+        display: flex;
+        gap: 10px;
+        padding: 12px 16px;
+        border-top: 1px solid rgba(0, 0, 0, 0.04);
+        align-items: center;
+        background: #fff;
+      }
+      .composer .input {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        outline: none;
+      }
+      .btn-send {
+        background: linear-gradient(90deg, var(--accentA), var(--accentB));
+        color: #fff;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      /* RESPONSIVE MOBILE (Untuk jaga-jaga) */
+      @media (max-width: 1100px) {
+        body {
+          padding: 0;
+          overflow: hidden;
+        }
+        .app {
+          height: 100vh;
+          width: 100vw;
+          border-radius: 0;
+          box-shadow: none;
+          flex-direction: row; /* Kembali ke row */
+          align-items: stretch;
+          overflow: hidden;
+        }
+
+        .col-icons {
+          /* Kolom ikon kembali seperti revisi sebelumnya (sidebar) */
+          position: fixed;
+          top: 0;
+          left: -68px;
+          height: 100%;
+          width: 68px;
+          z-index: 20;
+          transition: left 0.3s ease;
+          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+          border-right: 1px solid rgba(0, 0, 0, 0.04);
+          flex-direction: column;
+          padding: 14px 8px;
+        }
+        .app.show-menu .col-icons {
+          left: 0;
+        }
+
+        .panel-contacts {
+          width: 100%;
+          max-width: 100%;
+          border-right: none;
+          padding: 16px 12px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          z-index: 10;
+          transition: transform 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .panel-contacts .profile-mini {
+          display: flex;
+          align-items: center;
+          order: -1;
+          width: 100%;
+          padding-bottom: 0;
+          justify-content: space-between;
+        }
+
+        .profile-mini > .avatar-sm,
+        .profile-mini > .acct-meta {
+          display: none;
+        }
+        .chat-list-title,
+        .menu-btn-mobile {
+          display: block; /* Tampilkan elemen navigasi mobile */
+        }
+        .chat-list-title {
+          margin-right: auto;
+          margin-left: 10px;
+        }
+        .search {
+          order: 0;
+          margin-bottom: 0;
+        }
+        .contacts-list {
+          order: 1;
+          flex-grow: 1;
+          display: block;
+        }
+
+        .main-chat {
+          width: 100%;
+          position: absolute;
+          top: 0;
+          left: 100%;
+          bottom: 0;
+          z-index: 15;
+          transition: left 0.3s ease;
+        }
+        .chat-header .btn-back {
+          display: block; /* Tampilkan tombol kembali */
+        }
+        .avatar-lg {
+          width: 48px;
+          height: 48px;
+        }
+        .chat-header .header-info {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .app.show-chat .panel-contacts {
+          transform: translateX(-100%);
+        }
+        .app.show-chat .main-chat {
+          left: 0;
+        }
+
+        .app.show-menu:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 19;
+          display: block;
+        }
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+      .small {
+        font-size: 13px;
+        color: var(--muted);
+      }
+    
+@media (max-width: 1100px) {
+  .app {
+    height: 100vh !important; /* agar tidak terpotong di hp */
+  }
+  body {
+    overflow-y: auto !important; /* biar bisa digulir di hp */
+  }
+  .composer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    background: #fff;
+    z-index: 100;
+  }
+  .chat-body {
+    padding-bottom: 90px !important; /* agar pesan terakhir tidak tertutup composer */
+  }
+}
+
+
+.composer { display: none; }
+.chat-active .composer { display: flex; }
+
+</style>
+  </head>
+  <body>
+    <div
+      class="app"
+      role="application"
+      aria-label="Hive Social Chat App"
+      id="mainApp"
+    >
+      <div class="col-icons" aria-hidden="false" id="sideMenu">
+        <div class="brand">hs</div>
+        <button class="icon-btn"><i class="fa-solid fa-house"></i></button>
+        <button class="icon-btn">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="icon-btn">
+          <i class="fa-solid fa-square-plus"></i>
+        </button>
+        <button class="icon-btn"><i class="fa-solid fa-bullhorn"></i></button>
+        <button class="icon-btn active">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+        <button class="icon-btn"><i class="fa-solid fa-phone"></i></button>
+        <div style="flex: 1"></div>
+        <button class="icon-btn"><i class="fa-solid fa-user"></i></button>
+      </div>
+
+      <aside class="panel-contacts" aria-label="Daftar kontak">
+        <div class="profile-mini">
+          <button class="menu-btn-mobile" id="menuToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h2 class="chat-list-title">Hivesocial</h2>
+          <div class="avatar-sm">I</div>
+          <div class="acct-meta">
+            <div class="name">You</div>
+            <div class="sub">Account</div>
+          </div>
+        </div>
+
+        <div class="search" role="search" aria-label="Cari kontak">
+          <i
+            class="fa-solid fa-magnifying-glass"
+            style="color: var(--muted)"
+          ></i>
+          <input
+            id="inputSearch"
+            placeholder="Search"
+            aria-label="Cari kontak"
+          />
+        </div>
+
+        <div class="contacts-list" id="contactsList" aria-live="polite"></div>
+      </aside>
+
+      <main class="main-chat" aria-label="Ruang chat">
+        <header class="chat-header" id="chatHeader">
+          <button class="btn-back" id="chatBack">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div class="avatar-lg" id="headerAvatar">NA</div>
+          <div class="header-info">
+            <div class="title" id="headerName">Naisa Alifia Yuriza</div>
+            <div class="sub" id="headerSub">@nay_yuriza · HiveSocial</div>
+          </div>
+        </header>
+
+        <section class="chat-body" id="chatBody" aria-live="polite">
+          <div class="empty" id="emptyState">
+            <div>
+              <strong>Select a conversation to start</strong>
+              <p class="muted" style="margin-top: 8px">
+                Click on a contact on the left to start a conversation.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div class="composer">
+          <input
+            id="composerInput"
+            class="input"
+            placeholder="Type a message"
+            aria-label="Type a message"
+          />
+          <button id="composerSend" class="btn-send">
+            <i class="fa-solid fa-paper-plane"></i> Send
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      /* ---------- Config & Data ---------- */
+      const TYPING_MS = 10000;
+      const SHORT_TYPING_MS = 1200;
+
+      // KONTAK TELAH DIUBAH URUTANNYA: 1. giska, 2. ulil, 3. naisa
+      const contacts = [
+        // 1. giska
+        {
+          id: "giska",
+          display: "giska",
+          nameLower: "giska",
+          initials: "G",
+          status: "Online",
+          badge: 2,
+          messages: [
+            { from: "giska", text: "Free jako kah?" },
+            { from: "you", text: "Iya bisaja disitu" },
+            {
+              from: "you",
+              text: "karna kalo mingdep kyakna lumayan padat ma ka ta'liwa liwa ki tugas ku ini😭🙏",
+            },
+            {
+              from: "giska",
+              text: "chat di wa mi alya sama cinul,kah nda prnah mi aktif di hs jir😭na hapus keknya ",
+            },
+            {
+              from: "giska",
+              text: "di teaster dekat unhas maki bisaji kyakna di lantai 3  ",
+            },
+            {
+              from: "you",
+              text: "jangan sampai wacana ji lagi plis😭😌nda jadi jadi ",
+            },
+            {
+              from: "giska",
+              text: "upnormal di gantimi jdi yotta signatur cok jadi nda serumi disitu ",
+            },
+          ],
+        },
+        // 2. ulil abzhar
+        {
+          id: "ulil",
+          display: "ulil abzhar",
+          nameLower: "ulil abzhar",
+          initials: "U",
+          status: "Online",
+          badge: 2,
+          messages: [
+            { from: "you", text: "Mas, bahan kajiannya udah ready?" },
+            {
+              from: "ulil",
+              text: "Siap kak, nanti aku kirim PDFnya. Santai dulu.",
+            },
+          ],
+        },
+        // 3. Naisa Alifia Yuriza (Status dikembalikan ke 'Active now' agar titik hijau muncul)
+        {
+          id: "naisa",
+          display: "Naisa Alifia Yuriza",
+          nameLower: "naisa alifia yuriza",
+          handle: "@naisaalifiayuriza",
+          initials: "NA",
+          status: "Active yesterday",
+          badge: 0,
+          messages: [
+            {
+              from: "you",
+              text: "Assalamualaikum kak Naisa, maaf sebelumnya ganggu 🙏\nAku cuma mau bilang makasih karena beberapa konten kakak terutama tentang hijrah, bener-bener ngena. Jujur akhir-akhir ini imanku naik turun, tapi aku lagi berusaha banget buat tetap di jalan ini 🙂",
+            },
+            {
+              from: "naisa",
+              text: "Waalaikumsalam 🙂 alhamdulillah makasih banyak kak sudah menyampaikan ini.\nAku juga masih belajar kak, masih banyak kurangnya. Semangat yaa, proses itu wajar banget dalam hijrah 🤍",
+            },
+            {
+              from: "you",
+              text: "Iya kak, setuju banget… yang berat itu ternyata bukan memulai hijrah, tapi menjaga biar tetap istiqomah. Tapi insyaAllah selama masih mau belajar, Allah bantu ya kak 🙂",
+            },
+            {
+              from: "naisa",
+              text: "Bener kak, yang penting jangan pernah lelah untuk terus balik ke Allah 🤍 Allah lihat usaha kita kok, bukan hasil sempurnanya.",
+            },
+            {
+              from: "you",
+              text: "Btw kak, aku tadi nonton video terbaru kakak – yang “17 ribu di pasar cukup nggak?”\nMasyaAllah aku suka banget konsepnya. Simpel tapi penuh makna. Berasa diajak bersyukur lagi sama hal-hal kecil 👍",
+            },
+            {
+              from: "naisa",
+              text: "Alhamdulillah kalau bermanfaat kak 🙏 aku cuma pengen ngingetin ke diri sendiri juga, kalau hidup sederhana itu jauh lebih tenang. Yang penting berkah, bukan banyaknya 😊",
+            },
+            {
+              from: "you",
+              text: "Setuju banget kak. Makasih sudah terus nyebarin kebaikan lewat karya. Semoga Allah jaga dan mudahkan setiap langkah hijrah kita 🤲🙂",
+            },
+            { from: "naisa", text: "Bismillah istiqomah ya kak 🥹🤍" },
+          ],
+        },
+        // 4. rudi (Sisa urutan asli)
+        {
+          id: "rudi",
+          display: "rudi",
+          nameLower: "rudi",
+          initials: "R",
+          status: "",
+          badge: 0,
+          messages: [
+            { from: "you", text: "Bro, jadi ngumpul nggak malam ini?" },
+            {
+              from: "rudi",
+              text: "InsyaAllah jadi, jam 8 di lapangan. Bawa cemilan ya 😄",
+            },
+          ],
+        },
+        // 5. moonstarrr
+        {
+          id: "moon",
+          display: "moonstarrr",
+          nameLower: "moonstarrr",
+          initials: "M",
+          status: "Today",
+          badge: 0,
+          messages: [
+            { from: "moon", text: "Bro, song baru udah naik, cek ig ya 😎" },
+            { from: "you", text: "Mantap! aku share ke beberapa channel." },
+          ],
+        },
+        // 6. alyaandcookies
+        {
+          id: "alya",
+          display: "alyaandcookies",
+          nameLower: "alyaandcookies",
+          initials: "A",
+          status: "Active five days ago",
+          badge: 0,
+          messages: [
+            { from: "you", text: "Kapan kita ngopi lagi?" },
+            { from: "alya", text: "Minggu depan deh, kabarin aja." },
+          ],
+        },
+        // 7. del_asmayani
+        {
+          id: "del",
+          display: "del_asmayani",
+          nameLower: "del_asmayani",
+          initials: "D",
+          status: "Active today",
+          badge: 0,
+          messages: [
+            { from: "del", text: "Kapan " },
+            { from: "you", text: "Sama-sama, semoga lancar." },
+            { from: "del", text: "Kak, makasih bantuannya ya tadi 🙏" },
+            { from: "you", text: "Sama-sama, semoga lancar." },
+            { from: "del", text: "Kak, makasih bantuannya ya tadi 🙏" },
+            { from: "you", text: "Sama-sama, semoga lancar." },
+            { from: "del", text: "Kak, makasih bantuannya ya tadi 🙏" },
+            { from: "you", text: "Sama-sama, semoga lancar." },
+          ],
+        },
+      ];
+
+      // DOM refs
+      const mainApp = document.getElementById("mainApp");
+      const contactsListEl = document.getElementById("contactsList");
+      const chatBody = document.getElementById("chatBody");
+      const composerInput = document.getElementById("composerInput");
+      const composerSend = document.getElementById("composerSend");
+      const headerName = document.getElementById("headerName");
+      const headerSub = document.getElementById("headerSub");
+      const headerAvatar = document.getElementById("headerAvatar");
+
+      // Tombol Mobile
+      const menuToggle = document.getElementById("menuToggle");
+      const chatBackBtn = document.getElementById("chatBack");
+
+      let activeContactId = null;
+      let isRunning = false;
+      let typingTimer = null;
+
+      /* ---------- Helper functions (UNCHANGED) ---------- */
+      function escapeHtml(s) {
+        return String(s).replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;",
+            }[m])
+        );
+      }
+      function timeNow() {
+        const d = new Date();
+        return `${String(d.getHours()).padStart(2, "0")}:${String(
+          d.getMinutes()
+        ).padStart(2, "0")}`;
+      }
+      function createMessageEl(who, text) {
+        const wrap = document.createElement("div");
+        wrap.className = "msg " + (who === "you" ? "you" : "them");
+        const lines = String(text).split("\n").map(escapeHtml);
+        wrap.innerHTML = `<div>${lines.join(
+          "<br/>"
+        )}</div><div class="time">${timeNow()}</div>`;
+        return wrap;
+      }
+      function createTypingBubble(initials) {
+        const wrapper = document.createElement("div");
+        wrapper.id = "typingBubble";
+        wrapper.className = "typing-wrapper";
+        wrapper.setAttribute("aria-hidden", "true");
+        const bubble = document.createElement("div");
+        bubble.className = "typing-bubble";
+        bubble.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
+        wrapper.appendChild(bubble);
+        return wrapper;
+      }
+
+      function showTyping(initials, duration) {
+        removeTyping();
+        const tb = createTypingBubble(initials);
+        chatBody.appendChild(tb);
+        requestAnimationFrame(() => tb.classList.add("show"));
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return new Promise((resolve) => {
+          typingTimer = setTimeout(() => {
+            removeTyping();
+            resolve();
+          }, duration);
+        });
+      }
+
+      function removeTyping() {
+        const ex = document.getElementById("typingBubble");
+        if (ex) ex.remove();
+        if (typingTimer) {
+          clearTimeout(typingTimer);
+          typingTimer = null;
+        }
+      }
+
+      async function playScriptedConversation(messages) {
+        isRunning = true;
+        let i = 0;
+        removeTyping();
+        while (i < messages.length) {
+          const item = messages[i];
+          if (item.from === "you") {
+            const el = createMessageEl("you", item.text);
+            chatBody.appendChild(el);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            i++;
+            await new Promise((r) => setTimeout(r, 700));
+          } else {
+            // Waktu tunggu typing lebih lama untuk Naisa
+            await showTyping("NA", TYPING_MS);
+            const el = createMessageEl("them", item.text);
+            chatBody.appendChild(el);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            i++;
+            await new Promise((r) => setTimeout(r, 700));
+          }
+        }
+        isRunning = false;
+      }
+
+      composerSend.addEventListener("click", () => {
+        const txt = composerInput.value.trim();
+        if (!txt) return;
+        if (!activeContactId) {
+          // Akan membuka chat Giska jika giska adalah kontak pertama
+          openContact(contacts[0].id);
+          setTimeout(() => sendUserMessage(txt), 400);
+        } else {
+          sendUserMessage(txt);
+        }
+      });
+
+      function sendUserMessage(txt) {
+        const el = createMessageEl("you", txt);
+        const empty = document.getElementById("emptyState");
+        if (empty) empty.remove();
+        chatBody.appendChild(el);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        composerInput.value = "";
+        const current = contacts.find((c) => c.id === activeContactId);
+        if (!current) return;
+
+        if (current.id === "naisa") {
+          if (!isRunning) {
+            isRunning = true;
+            // Waktu tunggu typing lebih lama untuk Naisa
+            showTyping("NA", TYPING_MS).then(() => {
+              const reply = "Bismillah istiqomah ya kak 🥹🤍";
+              const el2 = createMessageEl("them", reply);
+              chatBody.appendChild(el2);
+              chatBody.scrollTop = chatBody.scrollHeight;
+              isRunning = false;
+            });
+          }
+        } else {
+          setTimeout(() => {
+            showTyping(current.initials, SHORT_TYPING_MS).then(() => {
+              const quickReplies = [
+                "Oke sip 👍",
+                "Siap, noted 🙂",
+                "Wah makasih infonya!",
+                "Bentar aku cek ya",
+                "Siap bro, makasih!",
+              ];
+              const text =
+                quickReplies[Math.floor(Math.random() * quickReplies.length)];
+              const el2 = createMessageEl("them", text);
+              chatBody.appendChild(el2);
+              chatBody.scrollTop = chatBody.scrollHeight;
+            });
+          }, 700);
+        }
+      }
+
+      composerInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          composerSend.click();
+        }
+      });
+
+      document.getElementById("inputSearch").addEventListener("input", (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll(".contact").forEach((node) => {
+          const txt = node.querySelector(".name").textContent.toLowerCase();
+          node.style.display = txt.includes(q) ? "" : "none";
+        });
+      });
+
+      /* ---------- Render contacts list ---------- */
+      function renderContactsList() {
+        contactsListEl.innerHTML = "";
+        contacts.forEach((c) => {
+          const el = document.createElement("div");
+          el.className = "contact";
+          el.tabIndex = 0;
+          el.dataset.id = c.id;
+
+          const badgeHtml =
+            c.badge && c.badge > 0
+              ? `<span class="badge">${c.badge}</span>`
+              : "";
+
+          let statusHtml = "";
+          let timeText = "";
+
+          // Logika khusus untuk Naisa (untuk menampilkan titik hijau dan waktu 09:12)
+          if (c.id === "naisa") {
+            statusHtml = `<span><span class="status-dot" aria-hidden="true"></span><span class="small">${c.status}</span></span>`;
+            timeText = ``; // <--- Waktu ditambahkan kembali untuk Naisa
+          } else {
+            statusHtml = `<span class="small">${c.status}</span>`;
+            timeText = "";
+          }
+
+          el.innerHTML = `
+          <div class="avatar" aria-hidden="true">${escapeHtml(c.initials)}</div>
+          <div class="meta">
+            <div class="name">${escapeHtml(c.display)}</div>
+            <div class="last">
+              <div class="last-text-wrap">${statusHtml}</div>
+              ${badgeHtml}
+              ${timeText ? `<span class="time-text">${timeText}</span>` : ""}
+            </div>
+          </div>
+        `;
+          el.addEventListener("click", () => openContact(c.id));
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") openContact(c.id);
+          });
+          contactsListEl.appendChild(el);
+        });
+      }
+
+      /* ---------- Open contact (main handler - UNCHANGED) ---------- */
+      function openContact(id) {
+        if (isRunning && activeContactId === id) return;
+
+        document
+          .querySelectorAll(".contact")
+          .forEach((n) => n.classList.remove("active"));
+        const clicked = document.querySelector(`.contact[data-id="${id}"]`);
+        if (clicked) clicked.classList.add("active");
+
+        if (window.innerWidth <= 1100) {
+          mainApp.classList.add("show-chat");
+          mainApp.classList.remove("show-menu");
+        }
+
+        activeContactId = id;
+        mainApp.classList.add('chat-active');
+        chatBody.innerHTML = "";
+        const c = contacts.find((x) => x.id === id);
+        if (!c) return;
+
+        headerAvatar.textContent = c.initials;
+        headerName.textContent = c.display;
+        headerSub.textContent = c.handle
+          ? `${c.handle} · HiveSocial`
+          : c.status
+          ? `${c.status}`
+          : "";
+
+        composerInput.value = "";
+        composerInput.placeholder = `Ketik pesan ke ${c.display}`;
+
+        if (c.id === "naisa") {
+          playScriptedConversation(c.messages);
+          return;
+        }
+
+        isRunning = true;
+        const msgs = c.messages || [];
+        if (!msgs.length) {
+          chatBody.innerHTML = `<div class="empty"><div><strong>Belum ada pesan</strong><p class="muted" style="margin-top:8px">Mulai percakapan dengan ${escapeHtml(
+            c.display
+          )}.</p></div></div>`;
+          isRunning = false;
+          return;
+        }
+
+        let idx = 0;
+        function appendNext() {
+          if (idx >= msgs.length) {
+            isRunning = false;
+            return;
+          }
+          const m = msgs[idx];
+          if (m.from !== "you") {
+            showTyping(c.initials, SHORT_TYPING_MS).then(() => {
+              const el = createMessageEl("them", m.text);
+              chatBody.appendChild(el);
+              chatBody.scrollTop = chatBody.scrollHeight;
+              idx++;
+              setTimeout(appendNext, 300);
+            });
+          } else {
+            const el = createMessageEl("you", m.text);
+            chatBody.appendChild(el);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            idx++;
+            setTimeout(appendNext, 300);
+          }
+        }
+        appendNext();
+      }
+
+      /* ---------- LOGIC MOBILE RESPONSIVE (NAVIGASI - UNCHANGED) ---------- */
+
+      if (menuToggle) {
+        menuToggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          mainApp.classList.toggle("show-menu");
+        });
+      }
+
+      if (chatBackBtn) {
+        chatBackBtn.addEventListener("click", () => {
+          if (window.innerWidth <= 1100) {
+            mainApp.classList.remove("show-chat");
+            mainApp.classList.remove('chat-active');
+          }
+        });
+      }
+
+      document.addEventListener("click", (e) => {
+        const isMenuOpen = mainApp.classList.contains("show-menu");
+        const isIconColumn = e.target.closest(".col-icons");
+        const isMenuButton = e.target.closest("#menuToggle");
+
+        if (isMenuOpen && !isIconColumn && !isMenuButton) {
+          mainApp.classList.remove("show-menu");
+        }
+      });
+
+      /* ---------- Init ---------- */
+      renderContactsList();
+
+      contactsListEl.querySelectorAll(".contact").forEach((n) => {
+        n.setAttribute("role", "button");
+      });
+
+      // cleanup on unload
+      window.addEventListener("beforeunload", () => {
+        if (typingTimer) clearTimeout(typingTimer);
+      });
+    </script>
+  </body>
+</html>
